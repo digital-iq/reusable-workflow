@@ -1,0 +1,20 @@
+name: reusable Pipeline
+
+on:
+  workflow_call:
+#    inputs:
+#      token:
+#        required: true
+#        type: string
+
+jobs:
+  hello-world:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run a one-line script
+        run: echo Hello, world from resusable workflow!
+
