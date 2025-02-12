@@ -1,0 +1,70 @@
+name: GitOps CI/CD
+
+on:
+  workflow_call:
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    container:
+      image: alpine/helm:latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Lint Helm chart
+        run: helm lint helm-*/
+
+  render:
+    runs-on: ubuntu-24.04
+    container:
+      image: alpine/helm:latest
+    needs: lint
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Checkout infra-gitops repo
+        uses: actions/checkout@v4
+        with:
+          repository: HayGroup/gitops-demo-applicationset-templates
+          token: ${{ secrets.KFONE_OCP_SB_GITHUB_PAT }} 
+          path: gitops-demo-applicationset-templates
+
+      - name: Render Helm chart
+        run: |
+          cd gitops-demo-applicationset-templates
+          helm template main-applicationset ./main-applicationset -f ../applicationset/values.yaml > rendered.yaml
+
+      - name: Upload rendered.yaml
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-yaml
+          path: gitops-demo-applicationset-templates/rendered.yaml
+          retention-days: 1
+
+  apply-to-openshift:
+    runs-on: ubuntu-24.04
+    container:
+      image: quay.io/openshift/origin-cli:latest
+    needs: render
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download rendered.yaml
+        uses: actions/download-artifact@v4
+        with:
+          name: rendered-yaml
+
+      - name: List artefact
+        run: |
+          cat rendered.yaml
+
+      - name: Login to PRD MGT OpenShift cluster
+        run: oc login --token=${{ secrets.GITOPS_DEMO_MGT_CLUSTER_TOKEN }} --insecure-skip-tls-verify --server=${{ secrets.GITOPS_DEMO_MGT_CLUSTER_URL }}
+
+      - name: Apply to PRD MGT OpenShift cluster
+        run: |
+          ls -la
+          oc apply -f rendered.yaml
