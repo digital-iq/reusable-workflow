@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: HayGroup/gitops-demo-applicationset-templates
-          token: ${{ secrets.KFONE_OCP_SB_GITHUB_PAT }} 
+          token: ${{ secrets.GITOPS_DEMO_REPO_PAT }} 
           path: gitops-demo-applicationset-templates
 
       - name: Render Helm chart
