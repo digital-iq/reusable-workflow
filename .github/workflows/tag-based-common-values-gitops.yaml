@@ -27,7 +27,7 @@ jobs:
       - name: Checkout infra-gitops repo
         uses: actions/checkout@v4
         with:
-          repository: HayGroup/gitops-demo-applicationset-templates
+          repository: digital-iq/gitops-demo-applicationset-templates
           token: ${{ secrets.GITOPS_DEMO_REPO_PAT }} 
           path: gitops-demo-applicationset-templates
 
