@@ -62,7 +62,7 @@ jobs:
           cat rendered.yaml
 
       - name: Login to PRD MGT OpenShift cluster
-        run: oc login --token=${{ secrets.GITOPS_DEMO_MGT_CLUSTER_TOKEN }} --insecure-skip-tls-verify --server=${{ secrets.GITOPS_DEMO_MGT_CLUSTER_URL }}
+        run: oc login --token=${{ secrets.GITOPS_DEMO_MGT_CLUSTER_TOKEN }} --insecure-skip-tls-verify --server=${{ vars.GITOPS_DEMO_MGT_CLUSTER_URL }}
 
       - name: Apply to PRD MGT OpenShift cluster
         run: |
